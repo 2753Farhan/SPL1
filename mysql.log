@@ -1,0 +1,11 @@
+2023-02-06T17:24:48.478682Z	   13 Query	SELECT id FROM users WHERE username = "shuvro"
+2023-02-06T17:25:14.227244Z	   13 Query	SELECT id,username,password FROM users WHERE username = "shuvro";
+2023-02-06T17:26:55.760510Z	   13 Query	INSERT INTO users (username,password) VALUES ("shuvro",1234)
+2023-02-06T17:31:36.791473Z	   13 Query	SELECT id,username,password FROM users WHERE username="" OR 1 = 1
+2023-02-06T17:32:51.051393Z	   13 Query	SELECT id,username,password FROM users WHERE username="" OR 1 = 1
+2023-02-06T17:34:14.327133Z	   13 Query	SELECT id,username,password FROM users WHERE username=" OR 1 = 1 -- -;
+;
+;
+"
+2023-02-06T17:35:11.323163Z	   13 Query	SET GLOBAL general_log= 'OFF'
+
