@@ -11,6 +11,21 @@ vector<string> extract_queries(string file_path)
     string line;
     string query = "";
     vector<string> queries;
+    vector<string> query_types;
+
+    if (file1.is_open()) // read query types from file
+    {
+        while (getline(file1, line))
+        {
+            query_types.push_back(line);
+        }
+        file1.close();
+    }
+    else
+    {
+        cout << "Unable to open querytype file" << endl;
+    }
+
     if (file.is_open())
     {
         bool found=false;
@@ -35,70 +50,62 @@ vector<string> extract_queries(string file_path)
             string qtype;
             bool pres=false;
 
-            while (getline(file1, qtype))
+            for (string type : query_types) // check if line contains a query type
             {
-                if (line.find(qtype)!=string::npos)
+                if (line.find(type) != string::npos)
                 {
-                    pres=true;
+                    pres = true;
+                    qtype = type;
                     break;
                 }
             }
-            if(qtype=="select")
+
+            if (qtype == "select")
             {
-                if(line.find("* from")!=string::npos||line.find("from")!=string::npos||line.find("where")!=string::npos||line.find("group by")!=string::npos||line.find("order by")!=string::npos)
+                if (line.find("* from") != string::npos || line.find("from") != string::npos || line.find("where") != string::npos || line.find("group by") != string::npos || line.find("order by") != string::npos)
                 {
                 }
-                else pres=false;
-
+                else pres = false;
             }
-            else if(qtype=="insert")
+            else if (qtype == "insert")
             {
-                if(line.find("into")!=string::npos||line.find("values")!=string::npos)
+                if (line.find("into") != string::npos || line.find("values") != string::npos)
                 {
                 }
-                else pres=false;
-
+                else pres = false;
             }
-            else if(qtype=="update")
+            else if (qtype == "update")
             {
-                if(line.find("set")!=string::npos||line.find("where")!=string::npos)
+                if (line.find("set") != string::npos || line.find("where") != string::npos)
                 {
                 }
-                else pres=false;
-
+                else pres = false;
             }
-            else if(qtype=="delete")
+            else if (qtype == "delete")
             {
-                if(line.find("from")!=string::npos||line.find("where")!=string::npos)
+                if (line.find("from") != string::npos || line.find("where") != string::npos)
                 {
                 }
-                else pres=false;
-
+                else pres = false;
             }
-            else if(qtype=="alter")
+            else if (qtype == "alter")
             {
-                if(line.find("table")!=string::npos||line.find("column")!=string::npos)
+                if (line.find("table") != string::npos || line.find("column") != string::npos)
                 {
                 }
-                else pres=false;
-
+                else pres = false;
             }
 
-            file1.clear();
-            file1.seekg(0, ios::beg);
             // Check if the line contains a SQL command
-
             if (pres)
             {
                 found=true;
                 command_pos=line.find(qtype);
                 // Add the portion of the line after the command to the query
                 query += original_line.substr(command_pos) + '\n';
-                //cout << "TEST " << query << "\n";
                 flag=false;
-                // Check if the line contains a semicolon, which indicates the end of the query
-
             }
+
             if (found)
             {
                 if(flag)
@@ -109,10 +116,9 @@ vector<string> extract_queries(string file_path)
                 {
                     queries.push_back(query);
                     query = "";
-                    found =false;
+                    found = false;
                 }
             }
-
         }
         file.close();
     }
@@ -121,7 +127,6 @@ vector<string> extract_queries(string file_path)
         cout << "Unable to open file" << endl;
     }
     return queries;
-
 }
 vector<string> extractlogQueries(const string& logFile)
 {
@@ -259,6 +264,7 @@ int main()
     {
         cout << val ;
     }
+    /*
     for(string val : mysqllogqueries)
     {
         cout <<val <<"\n" ;
@@ -272,6 +278,7 @@ int main()
         }
         else cout << "Abnormal sql query\n";
     }
+    */
     return 0;
 }
 //SELECT * FROM user WHERE ID='1' or '1=1'--'AND password='1234'
