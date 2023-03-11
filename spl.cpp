@@ -4,6 +4,30 @@
 #include <algorithm>
 #include <fstream>
 using namespace std;
+string removeExtraWhitespace(string str) {
+    string result = "";
+
+    // Flag to keep track of whether the last character was a whitespace character
+    bool lastCharWasWhitespace = false;
+
+    // Loop over each character in the input string
+    for (char c : str) {
+        if (c == ' ' || c == '\t' || c == '\n' || c == '\r') {
+            // If the current character is a whitespace character...
+            if (!lastCharWasWhitespace) {
+                // ...and the last character was not a whitespace character, add a single space to the output string
+                result += ' ';
+                lastCharWasWhitespace = true;
+            }
+        } else {
+            // If the current character is not a whitespace character, add it to the output string
+            result += c;
+            lastCharWasWhitespace = false;
+        }
+    }
+
+    return result;
+}
 vector<string> extract_queries(string file_path)
 {
     ifstream file(file_path);
@@ -45,7 +69,7 @@ vector<string> extract_queries(string file_path)
             {
                 line = line.substr(0, comment_start);
             }
-            int command_pos;
+            int command_pos,end_pos;
             bool flag=true;
             string qtype;
             bool pres=false;
@@ -72,7 +96,7 @@ vector<string> extract_queries(string file_path)
                 if (line.find("into") != string::npos || line.find("values") != string::npos)
                 {
                 }
-                else pres = false;
+                //else pres = false;
             }
             else if (qtype == "update")
             {
@@ -101,8 +125,9 @@ vector<string> extract_queries(string file_path)
             {
                 found=true;
                 command_pos=line.find(qtype);
+                end_pos=line.find(";");
                 // Add the portion of the line after the command to the query
-                query += original_line.substr(command_pos) + '\n';
+                query += original_line.substr(command_pos,end_pos-command_pos+1) + '\n';
                 flag=false;
             }
 
@@ -110,10 +135,14 @@ vector<string> extract_queries(string file_path)
             {
                 if(flag)
                 {
-                    query += original_line + '\n';
+                    end_pos=line.find(";");
+                    if(end_pos!=string :: npos){
+                        query += line.substr(0,end_pos);
+                    }
+                    else query += original_line + '\n';
                 }
                 if (line.find(";") != string::npos)
-                {
+                {   query=removeExtraWhitespace(query);
                     queries.push_back(query);
                     query = "";
                     found = false;
@@ -262,7 +291,7 @@ int main()
 
     for(string val : phpqueries)
     {
-        cout << val ;
+        cout << val<<"\n" ;
     }
     /*
     for(string val : mysqllogqueries)
