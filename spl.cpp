@@ -4,22 +4,86 @@
 #include <algorithm>
 #include <fstream>
 using namespace std;
-string removeExtraWhitespace(string str) {
+
+void removeUnpairedQuoteMarks(string& s)
+{
+    size_t quote_idx = s.find('"');
+    size_t last_quote_idx = s.rfind('"');
+
+    if (quote_idx == string::npos || last_quote_idx == string::npos || quote_idx == last_quote_idx)
+    {
+        size_t unpaired_quote_idx = quote_idx != string::npos ? quote_idx : last_quote_idx;
+        s.erase(unpaired_quote_idx, 1);
+    }
+}
+bool IsValidQuery(string s)
+{
+    string orgnl=s;
+    transform(s.begin(), s.end(), s.begin(), ::tolower);
+    if(s.find("select")!=string::npos)
+    {
+        if(s.find("from")!=string::npos)
+        {
+            return true;
+        }
+        else return false;
+    }
+    else if(s.find("insert")!=string::npos)
+    {
+        if(s.find("into")!=string::npos)
+        {
+            return true;
+        }
+        else return false;
+    }
+    else if(s.find("update")!=string::npos)
+    {
+        if(s.find("set")!=string::npos)
+        {
+            return true;
+        }
+        else return false;
+    }
+    else if(s.find("delete")!=string::npos)
+    {
+        if(s.find("from")!=string::npos)
+        {
+            return true;
+        }
+        else return false;
+    }
+    else if(s.find("alter")!=string::npos)
+    {
+        if(s.find("table")!=string::npos)
+        {
+            return true;
+        }
+        else return false;
+    }
+
+}
+string removeExtraWhitespace(string str)
+{
     string result = "";
 
     // Flag to keep track of whether the last character was a whitespace character
     bool lastCharWasWhitespace = false;
 
     // Loop over each character in the input string
-    for (char c : str) {
-        if (c == ' ' || c == '\t' || c == '\n' || c == '\r') {
+    for (char c : str)
+    {
+        if (c == ' ' || c == '\t' || c == '\n' || c == '\r')
+        {
             // If the current character is a whitespace character...
-            if (!lastCharWasWhitespace) {
+            if (!lastCharWasWhitespace)
+            {
                 // ...and the last character was not a whitespace character, add a single space to the output string
                 result += ' ';
                 lastCharWasWhitespace = true;
             }
-        } else {
+        }
+        else
+        {
             // If the current character is not a whitespace character, add it to the output string
             result += c;
             lastCharWasWhitespace = false;
@@ -28,6 +92,7 @@ string removeExtraWhitespace(string str) {
 
     return result;
 }
+
 vector<string> extract_queries(string file_path)
 {
     ifstream file(file_path);
@@ -84,41 +149,7 @@ vector<string> extract_queries(string file_path)
                 }
             }
 
-            if (qtype == "select")
-            {
-                if (line.find("* from") != string::npos || line.find("from") != string::npos || line.find("where") != string::npos || line.find("group by") != string::npos || line.find("order by") != string::npos)
-                {
-                }
-                else pres = false;
-            }
-            else if (qtype == "insert")
-            {
-                if (line.find("into") != string::npos || line.find("values") != string::npos)
-                {
-                }
-                //else pres = false;
-            }
-            else if (qtype == "update")
-            {
-                if (line.find("set") != string::npos || line.find("where") != string::npos)
-                {
-                }
-                else pres = false;
-            }
-            else if (qtype == "delete")
-            {
-                if (line.find("from") != string::npos || line.find("where") != string::npos)
-                {
-                }
-                else pres = false;
-            }
-            else if (qtype == "alter")
-            {
-                if (line.find("table") != string::npos || line.find("column") != string::npos)
-                {
-                }
-                else pres = false;
-            }
+
 
             // Check if the line contains a SQL command
             if (pres)
@@ -136,14 +167,21 @@ vector<string> extract_queries(string file_path)
                 if(flag)
                 {
                     end_pos=line.find(";");
-                    if(end_pos!=string :: npos){
-                        query += line.substr(0,end_pos);
+                    if(end_pos!=string :: npos)
+                    {
+                        query += line.substr(0,end_pos+1);
+                        //cout << query << "\n";
                     }
                     else query += original_line + '\n';
                 }
                 if (line.find(";") != string::npos)
-                {   query=removeExtraWhitespace(query);
-                    queries.push_back(query);
+                {
+                    query=removeExtraWhitespace(query);
+                    if(query.find("\"")!=string ::npos)
+                        removeUnpairedQuoteMarks(query);
+                    //cout << query <<"\n";
+                    if(IsValidQuery(query))
+                        queries.push_back(query);
                     query = "";
                     found = false;
                 }
@@ -167,17 +205,28 @@ vector<string> extractlogQueries(const string& logFile)
     }
 
     string line;
+    string query = "";
     while (getline(file, line))
     {
         int queryIndex = line.find("Query");
         if (queryIndex != string::npos)
         {
-            queries.push_back(line.substr(queryIndex + 6));
+            if (!query.empty())
+            {
+                queries.push_back(query);
+            }
+            query = line.substr(queryIndex + 6);
+        }
+        else
+        {
+            query += line;
         }
     }
-    for(int i=0; i<queries.size(); i++)
+
+    if (!query.empty())
     {
-        queries[i]+=";";
+        removeExtraWhitespace(query);
+        queries.push_back(query);
     }
 
     file.close();
@@ -282,7 +331,27 @@ string corresponding_phpquery(vector<string> phpquery,string logstring)
 
 
 }
-
+string xorStrings(string str1, string str2)
+{
+    string result;
+    for (int i = 0; i < str1.length() && i < str2.length(); i++)
+    {
+        result += (str1[i] ^ str2[i]);
+    }
+    return result;
+}
+bool isXorZero(string str1, string str2)
+{
+    string result = xorStrings(str1, str2);
+    for (int i = 0; i < result.length(); i++)
+    {
+        if (result[i] != 0)
+        {
+            return false;
+        }
+    }
+    return true;
+}
 int main()
 {
     vector<string> phpqueries,mysqllogqueries;
@@ -293,22 +362,24 @@ int main()
     {
         cout << val<<"\n" ;
     }
-    /*
+
     for(string val : mysqllogqueries)
     {
         cout <<val <<"\n" ;
     }
     for(auto val : mysqllogqueries)
     {
-        //cout <<removeattributeValues(val)<< " "<<removeattributeValues(corresponding_phpquery(phpqueries,val));
-        if(removeattributeValues(val)==removeattributeValues(corresponding_phpquery(phpqueries,val)))
+        string logquery=removeattributeValues(val);
+        string phpquery=removeattributeValues(corresponding_phpquery(phpqueries,val));
+        if(isXorZero(logquery,phpquery))
         {
-            cout << val << " is a normal sql query\n";
+            cout << val <<" is a valid query\n";
         }
-        else cout << "Abnormal sql query\n";
+        else cout << val <<" is a defective query\n";
+
     }
-    */
     return 0;
 }
 //SELECT * FROM user WHERE ID='1' or '1=1'--'AND password='1234'
+
 
