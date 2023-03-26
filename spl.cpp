@@ -8,12 +8,31 @@ using namespace std;
 void removeUnpairedQuoteMarks(string& s)
 {
     size_t quote_idx = s.find('"');
-    size_t last_quote_idx = s.rfind('"');
-
-    if (quote_idx == string::npos || last_quote_idx == string::npos || quote_idx == last_quote_idx)
+    while (quote_idx != string::npos)
     {
-        size_t unpaired_quote_idx = quote_idx != string::npos ? quote_idx : last_quote_idx;
-        s.erase(unpaired_quote_idx, 1);
+        size_t last_quote_idx = s.rfind('"');
+        if (quote_idx == last_quote_idx) // quotes are paired
+        {
+            quote_idx = s.find('"', last_quote_idx + 1);
+            continue;
+        }
+        if ((last_quote_idx != string::npos) && ((last_quote_idx - quote_idx) % 2 == 1))
+        {
+            // quotes are unpaired
+            s.erase(quote_idx, 1);
+            s.erase(last_quote_idx - 1, 1);
+        }
+        else if (last_quote_idx == string::npos)
+        {
+            // unpaired quote mark at the end of the string
+            s.erase(quote_idx, 1);
+        }
+        else
+        {
+            // unpaired quote mark at the beginning of the string
+            s.erase(last_quote_idx, 1);
+        }
+        quote_idx = s.find('"', last_quote_idx - 1);
     }
 }
 bool IsValidQuery(string s)
@@ -60,8 +79,22 @@ bool IsValidQuery(string s)
         }
         else return false;
     }
+    else if(s.find("drop")!=string::npos)
+    {
+        if(s.find("table")!=string::npos)
+        {
+            return true;
+        }
+        if(s.find("database")!=string::npos)
+        {
+            return true;
+        }
+        else return false;
+    }
+
 
 }
+
 string removeExtraWhitespace(string str)
 {
     string result = "";
@@ -177,6 +210,7 @@ vector<string> extract_queries(string file_path)
                 if (line.find(";") != string::npos)
                 {
                     query=removeExtraWhitespace(query);
+                    //cout << query <<"\n";
                     if(query.find("\"")!=string ::npos)
                         removeUnpairedQuoteMarks(query);
                     //cout << query <<"\n";
@@ -217,10 +251,17 @@ vector<string> extractlogQueries(const string& logFile)
             }
             query = line.substr(queryIndex + 6);
         }
-        else
+        else if (line.find("Quit") == string::npos && line.find("Init DB") == string::npos &&
+                 line.find("Connect") == string::npos && line.find("Quit") == string::npos &&
+                 (line.find("SELECT") == 0 || line.find("INSERT") == 0 ||
+                  line.find("UPDATE") == 0 || line.find("DELETE") == 0 ||
+                  line.find("REPLACE") == 0 || line.find("CREATE") == 0 ||
+                  line.find("ALTER") == 0 || line.find("DROP") == 0 ||
+                  line.find("TRUNCATE") == 0 || line.find("LOAD DATA") == 0))
         {
             query += line;
         }
+
     }
 
     if (!query.empty())
@@ -312,19 +353,60 @@ string longest_common_subsequence(string s1, string s2)
     }
     return result;
 }
+string detect_query_type(string query_string) {
+    string query_type = "";
+    string upper_query_string = "";
+    int pos = query_string.find(" ");
+    if (pos != string::npos) {
+        upper_query_string = query_string.substr(0, pos);
+    } else {
+        upper_query_string = query_string;
+    }
+
+    for (int i = 0; i < upper_query_string.length(); i++) {
+        query_type += toupper(upper_query_string[i]);
+    }
+
+    if (query_type == "SELECT") {
+        return "SELECT";
+    } else if (query_type == "INSERT") {
+        return "INSERT";
+    } else if (query_type == "UPDATE") {
+        return "UPDATE";
+    } else if (query_type == "DELETE") {
+        return "DELETE";
+    } else if (query_type == "CREATE") {
+        return "CREATE";
+    } else if (query_type == "DROP") {
+        return "DROP";
+    } else if (query_type == "ALTER") {
+        return "ALTER";
+    } else if (query_type == "TRUNCATE") {
+        return "TRUNCATE";
+    } else {
+        return "UNKNOWN";
+    }
+}
+
+
 string corresponding_phpquery(vector<string> phpquery,string logstring)
 {
     int Size=0;
-    string temp,st;
-    for(auto val:phpquery)
+    string temp,st="",qtype1,qtype2;
+    qtype1=detect_query_type(logstring);
+    for(string val : phpquery)
     {
-        temp=longest_common_subsequence(val,logstring);
-        //cout << temp << "\n";
-        if(temp.length()>Size)
-        {
-            Size=temp.length();
-            st=val;
+        qtype2=detect_query_type(val);
+        if(qtype1==qtype2){
+            temp=longest_common_subsequence(val,logstring);
+            //cout << temp << "\n";
+            if(temp.length()>Size)
+            {
+                Size=temp.length();
+                st=val;
+            }
         }
+
 
     }
     return st;
@@ -352,21 +434,46 @@ bool isXorZero(string str1, string str2)
     }
     return true;
 }
+vector<string> removeUnnecessaryLogquery(vector<string> php,vector<string> log){
+    vector<string> queryType;
+    for(auto  val: php){
+        queryType.push_back(detect_query_type(val));
+    }
+    for(int i=0;i<log.size();i++){
+        string qtype=detect_query_type(log[i]);
+        bool notPresent=true;
+        for(auto val: queryType ){
+            if(val==qtype){
+                notPresent=false;
+            }
+        }
+        if(notPresent){
+            log.erase(log.begin()+i);
+            i--;
+        }
+    }
+    return log;
+}
 int main()
 {
     vector<string> phpqueries,mysqllogqueries;
-    phpqueries=extract_queries("register.php");
-    mysqllogqueries=extractlogQueries("mysql.log");
 
+    phpqueries=extract_queries("register.php");
+    mysqllogqueries=extractlogQueries("MSI.log");
+    mysqllogqueries=removeUnnecessaryLogquery(phpqueries,mysqllogqueries);
+    cout << "Extracted php queries: \n\n";
     for(string val : phpqueries)
     {
-        cout << val<<"\n" ;
+        cout << val << "\nAfter removing attributes:\n";
+        cout <<removeattributeValues(val)<<"\n\n" ;
     }
-
+    cout << "Extracted log queries:\n\n";
     for(string val : mysqllogqueries)
     {
-        cout <<val <<"\n" ;
+        cout << val << "\nAfter removing attributes:\n";
+        cout <<removeattributeValues(val) <<"\n\n" ;
     }
+
     for(auto val : mysqllogqueries)
     {
         string logquery=removeattributeValues(val);
@@ -381,5 +488,4 @@ int main()
     return 0;
 }
 //SELECT * FROM user WHERE ID='1' or '1=1'--'AND password='1234'
-
 
