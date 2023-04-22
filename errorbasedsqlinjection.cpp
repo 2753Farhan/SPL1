@@ -27,7 +27,7 @@ int main() {
     }
 
     // URL to send requests to
-    std::string url = "http://localhost/tigernetBD-master/tgnet/login.php";
+    //std::string url = "http://localhost/tigernetBD-master/tgnet/login.php";
 
     // Open the file containing payloads
     std::ifstream infile("payloads.txt");
@@ -53,10 +53,11 @@ int main() {
     // Send requests for each payload in the vector
     for (const auto& payload : payloads) {
         std::string response;
+        std::string url = "http://localhost/tigernetBD-master/tgnet/login.php?id=" +payload+"Submit=Submit";
+
 
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, payload.c_str());
-        curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, payload.length());
+        curl_easy_setopt(curl, CURLOPT_HTTPGET, 1L);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
         curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, HeaderCallback);
