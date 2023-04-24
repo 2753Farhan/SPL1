@@ -15,7 +15,15 @@ size_t WriteCallback(char *ptr, size_t size, size_t nmemb, std::string *userdata
 size_t HeaderCallback(char *ptr, size_t size, size_t nmemb, void *userdata) {
     size_t len = size * nmemb;
     std::string header(ptr, len);
-    std::cout << "Header: " << header;
+    std::cout << "Response Header: " << header;
+    return len;
+}
+
+// Callback function to store request headers
+size_t RequestHeaderCallback(char *ptr, size_t size, size_t nmemb, void *userdata) {
+    size_t len = size * nmemb;
+    std::string header(ptr, len);
+    std::cout << "Request Header: " << header;
     return len;
 }
 
@@ -63,6 +71,8 @@ int main() {
         curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, HeaderCallback);
         curl_easy_setopt(curl, CURLOPT_HEADERDATA, NULL);
         curl_easy_setopt(curl, CURLOPT_HEADER, 1);
+        curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, RequestHeaderCallback);
+        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 
         CURLcode res = curl_easy_perform(curl);
         if (res != CURLE_OK) {
