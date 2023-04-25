@@ -11,21 +11,6 @@ size_t WriteCallback(char *ptr, size_t size, size_t nmemb, std::string *userdata
     return len;
 }
 
-// Callback function to store response headers
-size_t HeaderCallback(char *ptr, size_t size, size_t nmemb, void *userdata) {
-    size_t len = size * nmemb;
-    std::string header(ptr, len);
-    std::cout << "Response Header: " << header;
-    return len;
-}
-
-// Callback function to store request headers
-size_t RequestHeaderCallback(char *ptr, size_t size, size_t nmemb, void *userdata) {
-    size_t len = size * nmemb;
-    std::string header(ptr, len);
-    std::cout << "Request Header: " << header;
-    return len;
-}
 
 int main() {
     CURL *curl = curl_easy_init();
@@ -50,6 +35,7 @@ int main() {
     std::string payload;
     while (std::getline(infile, payload)) {
         payloads.push_back(payload);
+        std::cout << payload<<"\n";
     }
 
     // Close the file
@@ -59,20 +45,20 @@ int main() {
     bool vulnerable=false;
 
     // Send requests for each payload in the vector
-    for (const auto& payload : payloads) {
+    for (const auto  payload : payloads) {
+
+        std::cout <<"Used payload : "<<payload<<"\n......................\n";
         std::string response;
-        std::string url = "http://localhost/tigernetBD-master/tgnet/login.php?id=" +payload+"Submit=Submit";
+        std::string url = "http://localhost/DVWA-master/vulnerabilities/sqli/?id=" +payload+"&Submit=Submit";
 
 
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-        curl_easy_setopt(curl, CURLOPT_HTTPGET, 1L);
+        curl_easy_setopt(curl, CURLOPT_HTTPGET, 1);
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
-        curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, HeaderCallback);
+        //curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, HeaderCallback);
         curl_easy_setopt(curl, CURLOPT_HEADERDATA, NULL);
         curl_easy_setopt(curl, CURLOPT_HEADER, 1);
-        curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, RequestHeaderCallback);
-        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 
         CURLcode res = curl_easy_perform(curl);
         if (res != CURLE_OK) {
