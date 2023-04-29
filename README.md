@@ -6,7 +6,8 @@ This project aims to detect SQL injection vulnerabilities in a given user input 
 
 To run the project, you will need to follow these steps:
 
-1. Install the required libraries and tools, such as libcurl, libxml2, boost, and RapidJSON.
+1. Install the required libraries and tools, such as libcurl.
+2.Most of the codes are executed on dvwa.Download dvwa and configure it on your pc.
 2. Clone the project repository to your local machine.
 3. Open the project in your preferred IDE or editor, such as Visual Studio or Code::Blocks.
 4. Build and compile the project using the provided makefile.
