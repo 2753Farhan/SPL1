@@ -10,7 +10,51 @@ size_t WriteCallback(char *ptr, size_t size, size_t nmemb, std::string *userdata
     userdata->append(ptr, len);
     return len;
 }
+// Compute the prefix function for the pattern
+std::vector<int> compute_prefix(const std::string& pattern) {
+    int n = pattern.size();
+    std::vector<int> prefix(n);
+    prefix[0] = 0;
 
+    int j = 0;
+    for (int i = 1; i < n; i++) {
+        while (j > 0 && pattern[j] != pattern[i]) {
+            j = prefix[j-1];
+        }
+        if (pattern[j] == pattern[i]) {
+            j++;
+        }
+        prefix[i] = j;
+    }
+
+    return prefix;
+}
+
+// Search for the pattern within the text using the KMP algorithm
+size_t Find(const std::string& text, const std::string& pattern) {
+    int n = text.size();
+    int m = pattern.size();
+
+    // Compute the prefix function for the pattern
+    std::vector<int> prefix = compute_prefix(pattern);
+
+    int j = 0;
+    for (int i = 0; i < n; i++) {
+        while (j > 0 && pattern[j] != text[i]) {
+            j = prefix[j-1];
+        }
+        if (pattern[j] == text[i]) {
+            j++;
+        }
+        if (j == m) {
+            // Found a match at position i-m+1
+            return i-m+1;
+        }
+    }
+
+    // Pattern not found
+    return std::string::npos;
+}
 
 int main() {
     CURL *curl = curl_easy_init();
@@ -73,7 +117,7 @@ int main() {
         }
 
         std::cout << "Response: " << response << "\n";
-        if(response.find(errrormessage)!=std::string::npos){
+        if(Find(response,errrormessage)!=std::string::npos){
             vulnerable=true;
         }
 
