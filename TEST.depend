@@ -1,0 +1,226 @@
+# depslib dependency file v1.0
+1684882420 source:d:\video\test\main.cpp
+	<iostream>
+	"BooleanbasedBlind.h"
+	"errorbasedsqlInjection.h"
+	"Timebasedsqlinjection.h"
+	"sqlinjectiondetection.h"
+
+1684606031 d:\video\test\booleanbasedblind.cpp
+	<iostream>
+	<string>
+	<fstream>
+	<vector>
+	<curl/curl.h>
+	<sstream>
+
+1684883062 source:d:\video\test\booleanbasedblind.cpp
+	<iostream>
+	<string>
+	<fstream>
+	<vector>
+	<curl/curl.h>
+	<sstream>
+	<tuple>
+	"functions.h"
+
+1684882308 d:\video\test\booleanbasedblind.h
+	<iostream>
+
+1684882651 source:d:\video\test\errorbasedsqlinjection.cpp
+	<iostream>
+	<string>
+	<fstream>
+	<vector>
+	<curl/curl.h>
+	<tuple>
+	"functions.h"
+
+1684879381 source:d:\video\test\functions.cpp
+	<iostream>
+	<string>
+	<fstream>
+	<vector>
+	<curl/curl.h>
+	<sstream>
+	<tuple>
+
+1684608560 d:\video\test\functions.cpp
+	<iostream>
+	<string>
+	<fstream>
+	<vector>
+	<curl/curl.h>
+	<sstream>
+
+1684879424 d:\video\test\functions.h
+	<iostream>
+	<vector>
+	<tuple>
+
+1684882314 d:\video\test\errorbasedsqlinjection.h
+	<iostream>
+
+1684882321 d:\video\test\timebasedsqlinjection.h
+	<iostream>
+
+1684882853 source:d:\video\test\timebasedsqlinjection.cpp
+	<iostream>
+	<string>
+	<fstream>
+	<vector>
+	<curl/curl.h>
+	<sstream>
+	<chrono>
+	<tuple>
+	"functions.h"
+
+1684882043 d:\video\test\sqlinjectiondetection.h
+
+1684882340 source:d:\video\test\sqlinjectiondetection.cpp
+	<iostream>
+	<string>
+	<vector>
+	<algorithm>
+	<fstream>
+
+1684959630 source:c:\users\shuvro\desktop\test-master\booleanbasedblind.cpp
+	<iostream>
+	<string>
+	<fstream>
+	<vector>
+	<curl/curl.h>
+	<sstream>
+	<tuple>
+	"functions.h"
+
+1684884878 c:\users\shuvro\desktop\test-master\functions.h
+	<iostream>
+	<vector>
+	<tuple>
+
+1684959654 source:c:\users\shuvro\desktop\test-master\errorbasedsqlinjection.cpp
+	<iostream>
+	<string>
+	<fstream>
+	<vector>
+	<curl/curl.h>
+	<tuple>
+	<windows.h>
+	"functions.h"
+
+1684959678 source:c:\users\shuvro\desktop\test-master\functions.cpp
+	<iostream>
+	<string>
+	<fstream>
+	<vector>
+	<curl/curl.h>
+	<sstream>
+	<tuple>
+
+1684959318 source:c:\users\shuvro\desktop\test-master\main.cpp
+	<iostream>
+	"BooleanbasedBlind.h"
+	"errorbasedsqlInjection.h"
+	"Timebasedsqlinjection.h"
+	"sqlinjectiondetection.h"
+
+1684884877 c:\users\shuvro\desktop\test-master\booleanbasedblind.h
+	<iostream>
+
+1684884877 c:\users\shuvro\desktop\test-master\errorbasedsqlinjection.h
+	<iostream>
+
+1684884877 c:\users\shuvro\desktop\test-master\timebasedsqlinjection.h
+	<iostream>
+
+1684884878 c:\users\shuvro\desktop\test-master\sqlinjectiondetection.h
+
+1684965959 source:c:\users\shuvro\desktop\test-master\sqlinjectiondetection.cpp
+	<iostream>
+	<string>
+	<vector>
+	<algorithm>
+	<fstream>
+
+1684959643 source:c:\users\shuvro\desktop\test-master\timebasedsqlinjection.cpp
+	<iostream>
+	<string>
+	<fstream>
+	<vector>
+	<curl/curl.h>
+	<sstream>
+	<chrono>
+	<tuple>
+	"functions.h"
+
+1684967141 source:c:\users\user\desktop\spl1\booleanbasedblind.cpp
+	<iostream>
+	<string>
+	<fstream>
+	<vector>
+	<curl/curl.h>
+	<sstream>
+	<tuple>
+	"functions.h"
+
+1684967137 c:\users\user\desktop\spl1\functions.h
+	<iostream>
+	<vector>
+	<tuple>
+
+1684967141 source:c:\users\user\desktop\spl1\errorbasedsqlinjection.cpp
+	<iostream>
+	<string>
+	<fstream>
+	<vector>
+	<curl/curl.h>
+	<tuple>
+	<windows.h>
+	"functions.h"
+
+1684967137 source:c:\users\user\desktop\spl1\functions.cpp
+	<iostream>
+	<string>
+	<fstream>
+	<vector>
+	<curl/curl.h>
+	<sstream>
+	<tuple>
+
+1684967137 source:c:\users\user\desktop\spl1\main.cpp
+	<iostream>
+	"BooleanbasedBlind.h"
+	"errorbasedsqlInjection.h"
+	"Timebasedsqlinjection.h"
+	"sqlinjectiondetection.h"
+
+1684967137 c:\users\user\desktop\spl1\booleanbasedblind.h
+	<iostream>
+
+1684967137 c:\users\user\desktop\spl1\errorbasedsqlinjection.h
+	<iostream>
+
+1684967138 c:\users\user\desktop\spl1\timebasedsqlinjection.h
+	<iostream>
+
+1684967138 c:\users\user\desktop\spl1\sqlinjectiondetection.h
+
+1684967138 source:c:\users\user\desktop\spl1\sqlinjectiondetection.cpp
+	<iostream>
+	<string>
+	<vector>
+	<algorithm>
+	<fstream>
+
+1684967141 source:c:\users\user\desktop\spl1\timebasedsqlinjection.cpp
+	<iostream>
+	<string>
+	<fstream>
+	<vector>
+	<curl/curl.h>
+	<sstream>
+	<chrono>
+	<tuple>
+	"functions.h"
+

