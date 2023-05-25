@@ -14,6 +14,7 @@ Step 3: Use Code blocks or an IDE to run the project.
 ## Usage
 
 To use the tool, you will need to provide it with the web application URL you want to scan for SQL injection vulnerabilities. Follow the steps below to use the tool:
+
 Step 1: Move the PHP file of the website that you want to test to the directory where you have downloaded the tool. 
 Step 2: Run the project.
 Step 3: Choose options about What do you want to do?
