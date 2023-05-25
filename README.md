@@ -4,25 +4,40 @@ This project aims to detect SQL injection vulnerabilities in a given user input 
 
 ## Installation
 
-To run the project, you will need to follow these steps:
+To use the tool, you will need to install it on your system. The installation process is straightforward and can be completed in a few simple steps:
 
-1. Install the required libraries and tools, such as libcurl.
-2.Most of the codes are executed on dvwa.Download dvwa and configure it on your pc.
-2. Clone the project repository to your local machine.
-3. Open the project in your preferred IDE or editor, such as Visual Studio or Code::Blocks.
-4. Build and compile the project using the provided makefile.
+Step 1: Download the tool from the GitHub repository https://github.com/2753Farhan/SPL1 .
+Step 2: Extract the downloaded files to a folder on your system.
+Step 3: Use Code blocks or an IDE to run the project. 
+
 
 ## Usage
 
-To use the project, follow these steps:
+To use the tool, you will need to provide it with the web application URL you want to scan for SQL injection vulnerabilities. Follow the steps below to use the tool:
+Step 1: Move the PHP file of the website that you want to test to the directory where you have downloaded the tool. 
+Step 2: Run the project.
+Step 3: Choose options about What do you want to do?
+	1.SQL injection detection
+	2. Detect SQL vulnerabilities of a website.
+Step 4: If you select option 1, it will detect if there is any SQL injection in your website. 
 
-1. Run the compiled executable file.
-2. Provide the necessary inputs.
-3. The tool will analyze the input and detect any suspicious characters or code that could lead to SQL injection vulnerabilities.
+If you select option 2, It will ask for the URL of the web application you want to scan. After that, you have to provide the URL and press enter.
 
-The project includes a sample SQL database and a set of test cases to demonstrate the tool's functionality. The test cases cover various scenarios that can lead to SQL injection vulnerabilities, such as using single quotes, double quotes, semicolons, and other special characters.
+## Results:
 
-Please note that this project is intended for educational purposes only and should not be used to detect vulnerabilities in a production environment. It is recommended to use a professional security tool to perform vulnerability assessments and penetration testing.
+Once the scan is complete, the tool will provide you with the results of the analysis. The results will indicate whether potential SQL injection vulnerabilities were detected and provide information on the vulnerability type. The results will be displayed.
+
+## Interpretation of Results:
+
+The tool uses a simple and intuitive interface to display the results, making it easy to interpret and understand. The results will include the following information:
+
+- URL: The URL of the web page where the vulnerability was detected.
+- Vulnerability Type: The type of SQL injection vulnerability detected, such as boolean-based or error-based injection.
+- Payload: The payload used to detect the vulnerability.
+
+
+
+
 
 
 
